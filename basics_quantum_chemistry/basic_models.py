@@ -109,8 +109,45 @@ class ParticleBox():
                     self.eigenvalues[i, j, k] = self.calc_eigenvalue(i, j, k)
         return self.eigenvalues
 
-    def print_eigenvalues(self):
-        """Print the eigenvalues of the particle in a box."""
-        
 
-if __name__ == '__main__':
+    def determine_discrete_eigenvalues(self, eigenvalues: Dict) -> Set:
+        """Returns sorted set of discrete eigenvalues.
+
+        Parameters
+        ----------
+        eigenvalues : dict of {set of int : float}
+            Items represent eigenstate with eigenvalues.
+
+        Returns
+        -------
+        set of float
+            Different discrete eigenvalues.
+        """
+        return sorted({value for value in eigenvalues.values()})
+
+
+    def determine_degeneracy(self, eigenvalues: Dict) -> Dict:
+        """Returns list of degenerated eigenvalues.
+
+        Parameters
+        ----------
+        eigenvalues : dict of {set of int : float}
+            Items represent eigenstate with eigenvalue.
+
+        Returns
+        -------
+        list of (float, int, list of tuple of int)
+            list consist of: eigenvalue, degree of degeneracy, list of set of
+            degenerated eigenstates
+        """
+        self.degeneracy = []
+        discrete_eigenvalues = self.determine_degeneracy(eigenvalues)
+        for i in discrete_eigenvalues:
+            same_quantum_states = [state for state, value
+                                   in self.eigenvalues.items()
+                                   if value == i]
+        self.degeneracy.append([i,
+                                len(same_quantum_states),
+                                same_quantum_states])
+        return self.degeneracy
+
