@@ -6,7 +6,7 @@ chemistry.
 Content:
     - Particle in a Box: ParticleBox
 """
-from typing import Dict, List
+from typing import Dict, List, Set
 from scipy import constants
 from matplotlib import pyplot as plt
 
@@ -61,7 +61,7 @@ class ParticleBox():
                    + (n_y/self.length_y)**2
                    + (n_z/self.length_z)**2))
 
-    def calc_n_eigenvalues(self,
+    def calc_eigenvalues(self,
                            n_x: List = [1, 1],
                            n_y: List = [0, 0],
                            n_z: List = [0, 0]) -> Dict:
@@ -103,6 +103,7 @@ class ParticleBox():
         # example range(1) should calculate n for 1. Right now it would
         # calucalte 0, instead user has always to write a list with start and
         # end point.
+        # Use a genetator.
         for i in range(n_x[0], n_x[1]+1):
             for j in range(n_y[0], n_y[1]+1):
                 for k in range(n_z[0], n_z[1]+1):
@@ -141,13 +142,14 @@ class ParticleBox():
             degenerated eigenstates
         """
         self.degeneracy = []
-        discrete_eigenvalues = self.determine_degeneracy(eigenvalues)
+        discrete_eigenvalues = self.determine_discrete_eigenvalues(eigenvalues)
         for i in discrete_eigenvalues:
             same_quantum_states = [state for state, value
                                    in self.eigenvalues.items()
                                    if value == i]
-        self.degeneracy.append([i,
+            self.degeneracy.append([i,
                                 len(same_quantum_states),
                                 same_quantum_states])
         return self.degeneracy
 
+    # Draw different plots of particle in a box
