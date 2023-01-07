@@ -61,13 +61,13 @@ class ParticleBox():
 
         First Example
         >>> new_ParticleBoxA = ParticleBox()
-        >>> eigenvalue_a = new_ParticleBoxA._calc_eigenvalue(1, 1, 1)
+        >>> eigenvalue_a = new_ParticleBoxA.calc_eigenvalue(1, 1, 1)
         >>> print(eigenvalue_a)
         1.6464302112270383e-67
 
         Second Example
-        >>> new_ParticleBoxB = ParticleBox(1, 2, 2, 2)
-        >>> eigenvalue_b = new_ParticleBoxB._calc_eigenvalue(1, 1, 1)
+        >>> new_ParticleBoxB = ParticleBox()
+        >>> eigenvalue_b = new_ParticleBoxB.calc_eigenvalue(2, 2, 2)
         >>> print(eigenvalue_b)
         4.116075528067596e-68
         """
@@ -104,13 +104,13 @@ class ParticleBox():
 
         First Example
         >>> new_ParticleBoxA = ParticleBox()
-        >>> eigenvalues_a = new_ParicleBoxA.calc_eigenvalues()
+        >>> eigenvalues_a = new_ParicleBoxA.calc_n_eigenvalues()
         >>> print(eigenvalues_a)
         {(1, 0, 0): 5.488100704090127e-68}
 
         Second Example
         >>> new_ParticleBoxB = ParticleBox(1, 2, 2, 2)
-        >>> eigenvalues_b = new_ParticleBoxB.calc_eigenvalues([1 , 3])
+        >>> eigenvalues_b = new_ParticleBoxB.calc_n_eigenvalues([1 , 3])
         >>> print(eigenvalues_b)
         {(1, 0, 0): 1.3720251760225318e-68, (2, 0, 0): 5.488100704090127e-68,
          (3, 0, 0): 1.2348226584202787e-67}
@@ -125,7 +125,7 @@ class ParticleBox():
         for i in range(n_x[0], n_x[1]+1):
             for j in range(n_y[0], n_y[1]+1):
                 for k in range(n_z[0], n_z[1]+1):
-                    eigenvalues[i, j, k] = self._calc_eigenvalue(i, j, k)
+                    self.eigenvalues[i, j, k] = self.calc_eigenvalue(i, j, k)
         return eigenvalues
 
 
@@ -163,34 +163,15 @@ class ParticleBox():
         discrete_eigenvalues = self.determine_discrete_eigenvalues(eigenvalues)
         for i in discrete_eigenvalues:
             same_quantum_states = [state for state, value
-                                   in eigenvalues.items()
+                                   in self.eigenvalues.items()
                                    if value == i]
-            degeneracy.append([i,
+            self.degeneracy.append([i,
                                 len(same_quantum_states),
                                 same_quantum_states])
-        return degeneracy
+        return self.degeneracy
 
     # Draw different plots of a one-dimensional particle in a box
-
-    def plot_eigenvalues(self,
-                         n_x: List = [1, 1],
-                         n_y: List = [1, 1],
-                         n_z: List = [1, 1]):
-        eigenvalues = self.calc_eigenvalues(n_x, n_y, n_z)
-        degeneracy = self.determine_degeneracy(eigenvalues)
-        fig, ax = plt.subplots(layout='constrained')
-        for level in degeneracy:
-            ax.axhline(level[0], xmin=0, xmax=0.4)
-            ax.text(1, level[0], str(level[2]), ha='right', va='center')
-        # Style settings
-        ax.set_xticks([0, 1], [0, 'a'])
-        ax.set_xlabel('length')
-        ax.set_ylabel(r'$E_n[eV]$')
-        ax.set_title('Eigenvalues')
-        plt.show()
-
-    # Draw wavefunctions
-    def _calc_wavefunction(self, n_x: int, n_y: int, x: int, y: int):
+    def _calc_wavefunction(self, n_x: int, n_y: int):
         """Calculate the wavefunction for given principle quantun numbers.
 
         Attention: Because of spatial limitation only 1D and 2D wavefunctions
@@ -200,49 +181,13 @@ class ParticleBox():
         ----------
         n_x, n_y : int
             Priniciple quantum numbers for spatial directions x and y.
-        x, y : int
-            Values for the x-axis and the y-axis.
 
         Returns
         -------
         float
-            Value for the z-axis.
+            z-value of the wavefunction.
         """
         return (np.sqrt(4 / self.length_x * self.length_y)
                 * np.sin(n_x * np.pi * x / self.length_x)
                 * np.sin(n_y * np.pi * y / self.length_y))
 
-    def plot_wavefunctions(self,
-                           n_x: list = [1,1],
-                           n_y: list = [1,1]):
-        """Plot wavefunctions for principle quantum numbers n_x and n_y.
-
-        Parameters
-        ----------
-        n_x, n_y : list of int
-            principle quantum numbers, with n = 1, 2, 3, ...
-        """
-        if n_y
-            pass
-        else:
-
-    def _plot_1D_wavefuntion(self,
-                             n_x: List):
-
-
-    def _plot_2D_wavefunction(self,
-                              n_x: List,
-                              n_y: List):
-        x_values = np.linspace(0.0, self.length_x, 100)
-        y_values = np.linspace(0.0, self.length_y, 100)
-        for i in range(n_x[0], n_x[1]+1):
-            for j in range(n_y[0], n_y[1]+1):
-                X, Y = np.meshgrid(x_values, y_values)
-                Z = self._calc_wavefunction(i, j, X, Y)
-                ax = plt.figure().add_subplot(projection='3d')
-                ax.plot_surface(X, Y, Z, edgecolor='royalblue', lw=0.5,
-                                rstride=8, cstride=8, alpha=0.3)
-                ax.contour(X, Y, Z, zdir='z', offset=-2, cmap='coolwarm')
-                ax.contour(X, Y, Z, zdir='x', offset=-0.1, cmap='coolwarm')
-                ax.contour(X, Y, Z, zdir='y', offset=1.3, cmap='coolwarm')
-                plt.show()
